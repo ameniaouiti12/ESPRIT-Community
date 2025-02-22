@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+import 'create_community_screen.dart'; // Assuming this file exists (simplified version from earlier)
+import 'community_screen.dart'; // Add this import for CommunityScreen
+
+class CommunityListDrawer extends StatefulWidget {
+  const CommunityListDrawer({super.key});
+
+  @override
+  State<CommunityListDrawer> createState() => _CommunityListDrawerState();
+}
+
+class _CommunityListDrawerState extends State<CommunityListDrawer> {
+  bool _isYourCommunityListExpanded = true; // Your communities open by default
+  // Map to track favorite status of each community
+  final Map<String, bool> _favoriteCommunities = {
+    'ESPRIT Ingénieur': false,
+    'ESPRIT Business School': false,
+    'Centre de Carrière Esprit': false,
+  };
+
+  void navigateToCreateCommunity(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateCommunityScreen()),
+    );
+  }
+
+  void navigateToCommunity(BuildContext context, String communityName) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => CommunityScreen(name: communityName)),
+    );
+  }
+
+  void navigateToAllCommunities(BuildContext context) {
+    // Navigate to a screen for all communities (you can define AllCommunitiesScreen)
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AllCommunitiesScreen()), // Placeholder
+    );
+  }
+
+  void toggleFavorite(String community) {
+    setState(() {
+      _favoriteCommunities[community] = !_favoriteCommunities[community]!;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> yourCommunities = [
+      'ESPRIT Ingénieur',
+      'ESPRIT Business School',
+      'Centre de Carrière Esprit',
+    ];
+
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Your Communities Section (Expandable)
+            ExpansionTile(
+              title: const Text('Vos communautés'),
+              leading: const Icon(Icons.group, color: Colors.red),
+              initiallyExpanded: _isYourCommunityListExpanded,
+              onExpansionChanged: (bool expanded) {
+                setState(() {
+                  _isYourCommunityListExpanded = expanded;
+                });
+              },
+              children: [
+                ListTile(
+                  title: const Text('Créer une communauté'),
+                  leading: const Icon(Icons.add, color: Colors.red),
+                  onTap: () => navigateToCreateCommunity(context),
+                ),
+                ...yourCommunities.map((community) => ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: AssetImage(_getImageForCommunity(community)),
+                    radius: 16,
+                  ),
+                  title: Text(community),
+                  trailing: IconButton(
+                    icon: Icon(
+                      _favoriteCommunities[community]!
+                          ? Icons.star
+                          : Icons.star_border,
+                      color: _favoriteCommunities[community]! ? Colors.yellow : Colors.grey,
+                    ),
+                    onPressed: () => toggleFavorite(community),
+                  ),
+                  onTap: () => navigateToCommunity(context, community),
+                )),
+              ],
+            ),
+            // All Communities Section (Single Link)
+            ListTile(
+              title: const Text('Toutes'),
+              leading: const Icon(Icons.public, color: Colors.red),
+              onTap: () => navigateToAllCommunities(context),
+            ),
+            const Expanded(child: SizedBox()), // Keeps layout consistent
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getImageForCommunity(String community) {
+    switch (community) {
+      case 'ESPRIT Ingénieur':
+        return 'assets/esprit.png';
+      case 'ESPRIT Business School':
+        return 'assets/espritC-C.jpeg';
+      case 'Centre de Carrière Esprit':
+        return 'assets/esb.jpeg';
+      default:
+        return 'assets/esprit.jpeg'; // Fallback image
+    }
+  }
+}
+
+// Placeholder for AllCommunitiesScreen (you can expand this)
+class AllCommunitiesScreen extends StatelessWidget {
+  const AllCommunitiesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Toutes les communautés')),
+      body: const Center(child: Text('Liste de toutes les communautés')),
+    );
+  }
+}

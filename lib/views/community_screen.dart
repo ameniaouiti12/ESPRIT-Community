@@ -1,4 +1,7 @@
+import 'package:esprit/views/CommunityListDrawer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // For system UI customization
+import 'mod_tools_screen.dart'; // Assuming this file exists
 
 class CommunityScreen extends StatefulWidget {
   final String name;
@@ -8,14 +11,15 @@ class CommunityScreen extends StatefulWidget {
   State<CommunityScreen> createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends State<CommunityScreen> {
-  // Mock community data
+class _CommunityScreenState extends State<CommunityScreen>
+    with SingleTickerProviderStateMixin {
+  // Mock community data (for the current community)
   final Map<String, dynamic> mockCommunity = {
     'name': 'flutter',
-    'banner': 'https://via.placeholder.com/400x150', // Placeholder banner image
-    'avatar': 'https://via.placeholder.com/100', // Placeholder avatar image
-    'members': ['user1', 'user2', 'user3'], // Mock member UIDs
-    'mods': ['user1'], // Mock moderator UIDs
+    'banner': 'https://via.placeholder.com/400x150',
+    'avatar': 'https://via.placeholder.com/100',
+    'members': ['user1', 'user2', 'user3'],
+    'mods': ['user1'],
   };
 
   // Mock user data
@@ -24,136 +28,436 @@ class _CommunityScreenState extends State<CommunityScreen> {
     'isAuthenticated': true,
   };
 
-  // Mock posts data
-  final List<Map<String, String>> mockPosts = [
-    {'title': 'Post 1', 'content': 'This is the first post'},
-    {'title': 'Post 2', 'content': 'This is the second post'},
+  // Mock community data for recommendations
+  final List<Map<String, dynamic>> mockCommunities = [
+    {
+      'name': 'wholesomememes',
+      'avatar': 'https://via.placeholder.com/50?text=WM',
+      'members': '18.3m',
+      'description':
+          'Bienvenue sur le côté positif d’internet ! Des mèmes qui font sourire.',
+      'isJoined': false,
+    },
+    {
+      'name': 'buccaneers',
+      'avatar': 'https://via.placeholder.com/50?text=BUC',
+      'members': '197k',
+      'description':
+          'Fête les Buccaneers de Tampa Bay, champions du Super Bowl à deux reprises.',
+      'isJoined': false,
+    },
+    {
+      'name': 'AnimalsBeingBros',
+      'avatar': 'https://via.placeholder.com/50?text=AB',
+      'members': '6.9m',
+      'description':
+          'Célèbre les façons adorables et touchantes dont les animaux s’entraident.',
+      'isJoined': false,
+    },
+    {
+      'name': 'Awww',
+      'avatar': 'https://via.placeholder.com/50?text=AW',
+      'members': '999k',
+      'description':
+          'Partage ton amour pour tout ce qui est mignon et attendrissant sur Reddit.',
+      'isJoined': false,
+    },
   ];
 
-  bool isJoined = false;
+  // Mock thematic categories
+  final List<String> mockCategories = [
+    'Culture Internet',
+    'Jeux',
+    'Actualités et politique',
+    'Questions-réponses',
+    'Technologie',
+    'Films et séries',
+    'Lieux et voyages',
+    'Pop culture',
+  ];
 
-  void navigateToModTools(BuildContext context) {
-    // Simulate navigation (replace with your navigation logic if needed)
-    print('Navigating to mod tools for ${widget.name}');
+  String? selectedCategory;
+  bool isLoading = false;
+  bool hasError = false;
+  late AnimationController
+      _animationController; // Keep as late, but ensure initialization
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync:
+          this, // Use 'this' as the SingleTickerProviderStateMixin provides vsync
+      duration: const Duration(milliseconds: 500),
+    )..forward(); // Chain forward to start the animation immediately
   }
 
-  void joinCommunity(BuildContext context) {
+  @override
+  void dispose() {
+    _animationController.dispose(); // Dispose to prevent memory leaks
+    super.dispose();
+  }
+
+  void navigateToModTools(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ModToolsScreen(name: widget.name),
+      ),
+    );
+  }
+
+  void toggleJoinCommunity(String communityName) {
     setState(() {
-      isJoined = !isJoined;
-      if (isJoined) {
-        mockCommunity['members'].add(mockUser['uid']);
+      final community =
+          mockCommunities.firstWhere((c) => c['name'] == communityName);
+      community['isJoined'] = !community['isJoined'];
+      if (community['isJoined']) {
+        print('Joined $communityName');
       } else {
-        mockCommunity['members'].remove(mockUser['uid']);
+        print('Left $communityName');
       }
     });
-    print(
-        'User ${mockUser['uid']} ${isJoined ? 'joined' : 'left'} ${widget.name}');
+  }
+
+  Future<void> refreshCommunities() async {
+    setState(() {
+      isLoading = true;
+      hasError = false;
+    });
+    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+    setState(() {
+      isLoading = false;
+      // Simulate potential error (e.g., 20% chance)
+      if (DateTime.now().second % 5 == 0) {
+        hasError = true;
+      } else {
+        mockCommunities.shuffle(); // Refresh with shuffled data
+      }
+    });
+  }
+
+  List<Map<String, dynamic>> getFilteredCommunities() {
+    if (selectedCategory == null) return mockCommunities;
+    return mockCommunities.where((community) {
+      final categoryMap = {
+        'Culture Internet': ['wholesomememes'],
+        'Jeux': [],
+        'Actualités et politique': [],
+        'Questions-réponses': [],
+        'Technologie': ['flutter'],
+        'Films et séries': [],
+        'Lieux et voyages': [],
+        'Pop culture': ['buccaneers', 'Awww'],
+      };
+      return categoryMap[selectedCategory]!.contains(community['name']);
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light,
+    ));
+
     final user = mockUser;
     final isGuest = !user['isAuthenticated'];
-    final community = mockCommunity;
+    final communities = getFilteredCommunities();
 
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, innerBoxIsScrolled) {
-          return [
-            SliverAppBar(
-              expandedHeight: 150,
-              floating: true,
-              snap: true,
-              flexibleSpace: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.network(
-                      community['banner'],
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ],
-              ),
+      appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(Icons.menu, color: Colors.white),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+        title: const Text(
+          'Communautés',
+          style: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search, color: Colors.white),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: CommunitySearchDelegate(mockCommunities),
+              );
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Image.network(
+              'https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png',
+              width: 32,
+              height: 32,
             ),
-            SliverPadding(
-              padding: const EdgeInsets.all(16),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate(
-                  [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(community['avatar']),
-                        radius: 35,
-                      ),
+          ),
+        ],
+        backgroundColor: Colors.red[900],
+        elevation: 0,
+      ),
+      drawer:
+          const CommunityListDrawer(), // Replace the existing Drawer with CommunityListDrawer
+      backgroundColor: Colors.grey[100],
+      body: RefreshIndicator(
+        onRefresh: refreshCommunities,
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : hasError
+                ? Center(
+                    child: ErrorWidget(
+                      'Une erreur est survenue. Veuillez réessayer.',
+                      onRetry: refreshCommunities,
                     ),
-                    const SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'r/${community['name']}',
-                          style: const TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.bold,
+                  )
+                : Column(
+                    children: [
+                      // Thematic Categories
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          height: 50,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: mockCategories.length,
+                            itemBuilder: (context, index) {
+                              final isSelected =
+                                  selectedCategory == mockCategories[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 200),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        selectedCategory = isSelected
+                                            ? null
+                                            : mockCategories[index];
+                                      });
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: isSelected
+                                          ? Colors.red
+                                          : Colors.grey[200],
+                                      foregroundColor: isSelected
+                                          ? Colors.white
+                                          : Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
+                                    child: Text(mockCategories[index]),
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         ),
-                        if (!isGuest)
-                          (community['mods'] as List).contains(user['uid'])
-                              ? OutlinedButton(
-                                  onPressed: () {
-                                    navigateToModTools(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 25),
-                                  ),
-                                  child: const Text('Mod Tools'),
-                                )
-                              : OutlinedButton(
-                                  onPressed: () => joinCommunity(context),
-                                  style: ElevatedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 25),
-                                  ),
-                                  child: Text((community['members'] as List)
-                                          .contains(user['uid'])
-                                      ? 'Joined'
-                                      : 'Join'),
-                                ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: Text(
-                        '${(community['members'] as List).length} members',
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ];
-        },
-        body: ListView.builder(
-          itemCount: mockPosts.length,
-          itemBuilder: (BuildContext context, int index) {
-            final post = mockPosts[index];
-            return Card(
-              child: ListTile(
-                title: Text(post['title']!),
-                subtitle: Text(post['content']!),
-              ),
-            );
-          },
-        ),
+                      // Recommended Communities
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          'Recommandées pour toi',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87),
+                        ),
+                      ),
+                      Expanded(
+                        child: FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: _animationController,
+                            curve: Curves.easeInOut,
+                          ),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0),
+                            itemCount: communities.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final community = communities[index];
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: AnimatedScale(
+                                  scale: 1.0,
+                                  duration: const Duration(milliseconds: 300),
+                                  child: Card(
+                                    elevation: 2,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          CircleAvatar(
+                                            backgroundImage: NetworkImage(
+                                                community['avatar']),
+                                            radius: 20,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  community['name'],
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  '${community['members']} membres',
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.grey),
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  community['description'],
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black87),
+                                                  maxLines: 2,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          OutlinedButton(
+                                            onPressed: () =>
+                                                toggleJoinCommunity(
+                                                    community['name']),
+                                            style: OutlinedButton.styleFrom(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                      vertical: 6),
+                                              foregroundColor: Colors.black,
+                                              side:
+                                                  BorderSide(color: Colors.red),
+                                            ),
+                                            child: Text(community['isJoined']
+                                                ? 'Rejoint'
+                                                : 'Rejoindre'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
       ),
     );
+  }
+}
+
+// Custom Error Widget
+class ErrorWidget extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const ErrorWidget(this.message, {required this.onRetry, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          message,
+          style: TextStyle(color: Colors.red, fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: onRetry,
+          child: const Text('Réessayer'),
+        ),
+      ],
+    );
+  }
+}
+
+// Search Delegate for Communities
+class CommunitySearchDelegate extends SearchDelegate<String> {
+  final List<Map<String, dynamic>> communities;
+
+  CommunitySearchDelegate(this.communities);
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    final filteredCommunities = communities
+        .where((community) =>
+            community['name'].toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    return ListView.builder(
+      itemCount: filteredCommunities.length,
+      itemBuilder: (context, index) {
+        final community = filteredCommunities[index];
+        return ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(community['avatar']),
+            radius: 20,
+          ),
+          title: Text(community['name']),
+          subtitle: Text('${community['members']} membres'),
+          onTap: () {
+            close(context, community['name']);
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return buildResults(context);
   }
 }
