@@ -1,0 +1,50 @@
+import 'package:flutter/material.dart';
+import 'package:esprit/auth/login_screen';
+
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  _SplashScreenState createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  double _opacity = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Démarrez l'animation après un court délai
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      setState(() {
+        _opacity = 1.0;
+      });
+    });
+
+    // Naviguez vers l'écran de connexion après 3 secondes
+    Future.delayed(const Duration(seconds: 5), () {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(
+        child: AnimatedOpacity(
+          opacity: _opacity,
+          duration: const Duration(seconds: 1),
+          child: Image.asset(
+            'assets/esprit.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+}
