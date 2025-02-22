@@ -5,7 +5,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.5.4
+  sdk: '>=3.5.4 <4.0.0'  # Spécifiez une plage pour éviter les problèmes de compatibilité future
 
 dependencies:
   flutter:
@@ -14,15 +14,11 @@ dependencies:
   cupertino_icons: ^1.0.8
   dotted_border: ^2.0.0+2
   url_launcher: ^6.1.11
-  webview_flutter: ^4.4.0
+  webview_flutter: ^4.0.7
   image_picker: ^1.0.7
-  file_picker: ^6.1.1  # Utilisez la dernière version stable (vérifiez sur pub.dev)
-  share_plus: ^7.0.0
-  provider: ^6.0.0
-
-
-
-
+  share_plus: ^7.0.2
+  provider: ^6.0.5
+  file_picker: ^7.1.0+1  # Corrigez la version ici
 
 dev_dependencies:
   flutter_test:
@@ -36,4 +32,3 @@ flutter:
     - assets/espritC-C.jpeg 
     - assets/esb.jpeg
     - assets/avatar.png
-    # Ensure this matches your file name and path
