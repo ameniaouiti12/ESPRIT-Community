@@ -28,11 +28,19 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
           case 0:
             Routemaster.of(context).push('/home');
             break;
+          case 1: // Communities tab
+            Routemaster.of(context)
+                .push('/communities'); // New route for CommunityScreen
+            break;
           case 2:
             Routemaster.of(context).push('/add-post');
             break;
           case 3:
             Routemaster.of(context).push('/discuter');
+            break;
+          case 4: // Podcast tab
+            Routemaster.of(context)
+                .push('/podcast'); // Navigate to PodcastScreen
             break;
           default:
             print('Navigation non implémentée pour cet index: $index');

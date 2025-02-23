@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:routemaster/routemaster.dart';
+import 'package:esprit/Views/NavBar.dart'; // Import CustomNavigationBar (adjust path if needed)
 
 class EditCommunityScreen extends StatefulWidget {
   final String name;
@@ -14,17 +16,17 @@ class EditCommunityScreen extends StatefulWidget {
 class _EditCommunityScreenState extends State<EditCommunityScreen> {
   late TextEditingController _communityNameController;
   late TextEditingController _descriptionController;
-  List<String> _selectedThemes = []; // Thèmes sélectionnés
-  String? _communityType; // Type de communauté
+  List<String> _selectedThemes = [];
+  String? _communityType;
   bool _isLoading = false;
 
-  // Données mock de la communauté existante
+  // Mock community data
   final Map<String, dynamic> _mockCommunity = {
     'name': 'flutter',
     'description': 'Une communauté pour les passionnés de Flutter.',
-    'themes': ['Technologie', 'Développement'], // Thèmes par défaut
-    'type': 'Publique', // Type par défaut
-    'isSensitive': false, // Sensible par défaut
+    'themes': ['Technologie', 'Développement'],
+    'type': 'Publique',
+    'isSensitive': false,
   };
 
   // Liste des thèmes avec sous-catégories
@@ -43,9 +45,8 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
 
   // Données statiques pour les images (placeholders)
   final Map<String, String> _mockImages = {
-    'banner':
-        'https://via.placeholder.com/400x150', // Image statique pour le bannière
-    'avatar': 'assets/avatar.png', // Image locale pour l’avatar
+    'banner': 'https://via.placeholder.com/400x150',
+    'avatar': 'assets/avatar.png',
   };
 
   // Constantes pour les styles
@@ -67,16 +68,13 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
 
   void _initializeControllers() {
     _communityNameController = TextEditingController(
-      text: (_mockCommunity['name'] as String?) ?? 'Nom par défaut',
+      text: widget.name, // Use the passed community name
     );
     _descriptionController = TextEditingController(
-      text: (_mockCommunity['description'] as String?) ??
-          'Description par défaut',
+      text: _mockCommunity['description'] ?? 'Description par défaut',
     );
-    _selectedThemes = List<String>.from(
-      (_mockCommunity['themes'] as List<String>?)?.toList() ?? [],
-    );
-    _communityType = (_mockCommunity['type'] as String?) ?? 'Publique';
+    _selectedThemes = List<String>.from(_mockCommunity['themes'] ?? []);
+    _communityType = _mockCommunity['type'] ?? 'Publique';
   }
 
   @override
@@ -112,7 +110,6 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
       return;
     }
 
-    // Vérifier si les thèmes sélectionnés sont valides
     if (_selectedThemes.any((theme) => !_themes.keys.contains(theme))) {
       _showSnackBar('Un ou plusieurs thèmes sélectionnés sont invalides.');
       return;
@@ -139,8 +136,6 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
 
     if (confirm == true) {
       setState(() => _isLoading = true);
-
-      // Simuler la mise à jour locale (sans API)
       final updatedCommunity = {
         'name': _communityNameController.text.trim(),
         'description': _descriptionController.text.trim(),
@@ -148,13 +143,12 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
         'type': _communityType,
       };
 
-      _mockCommunity.addAll(updatedCommunity); // Mettre à jour les données mock
+      _mockCommunity.addAll(updatedCommunity);
 
-      Future.delayed(const Duration(milliseconds: 500), () {
-        setState(() => _isLoading = false);
-        _showSnackBarWithAction('Communauté mise à jour avec succès !');
-        Navigator.pop(context); // Retourner à l’écran précédent
-      });
+      await Future.delayed(const Duration(milliseconds: 500));
+      setState(() => _isLoading = false);
+      _showSnackBarWithAction('Communauté mise à jour avec succès !');
+      Navigator.pop(context);
     }
   }
 
@@ -194,10 +188,9 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
             decoration: BoxDecoration(
               borderRadius: _borderRadius,
               image: DecorationImage(
-                image: _buildImageOrPlaceholder(_mockImages['banner']!),
+                image: NetworkImage(_mockImages['banner']!),
                 fit: BoxFit.cover,
-                onError: (exception, stackTrace) =>
-                    const Icon(Icons.error, color: Colors.red),
+                onError: (_, __) => const Icon(Icons.error),
               ),
             ),
           ),
@@ -205,24 +198,14 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
             bottom: 20,
             left: 20,
             child: CircleAvatar(
-              backgroundImage: _buildImageOrPlaceholder(_mockImages['avatar']!),
+              backgroundImage: AssetImage(_mockImages['avatar']!),
               radius: 32,
-              onBackgroundImageError: (exception, stackTrace) =>
-                  const Icon(Icons.person, color: Colors.grey),
+              onBackgroundImageError: (_, __) => const Icon(Icons.person),
             ),
           ),
         ],
       ),
     );
-  }
-
-  ImageProvider _buildImageOrPlaceholder(String url) {
-    try {
-      return NetworkImage(url);
-    } catch (e) {
-      return const AssetImage('assets/placeholder.png')
-          as ImageProvider; // Assurez-vous d'avoir un fichier placeholder dans assets
-    }
   }
 
   Widget _buildThemeSection() {
@@ -238,6 +221,7 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
         const SizedBox(height: 8),
         ListView(
           shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
           children: _themes.keys.map((theme) {
             return CheckboxListTile(
               title: Tooltip(
@@ -246,11 +230,8 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
               ),
               value: _selectedThemes.contains(theme),
               onChanged: (_) => _toggleTheme(theme),
-              activeColor: Colors.blue,
+              activeColor: Colors.red[900], // Changed to match theme
               checkColor: Colors.white,
-              tileColor: Theme.of(context).brightness == Brightness.dark
-                  ? Colors.grey[800]
-                  : null,
             );
           }).toList(),
         ),
@@ -283,58 +264,52 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
                       ? 'Tout le monde peut voir cette communauté, mais seuls les membres approuvés peuvent contribuer'
                       : 'Uniquement les membres approuvés peuvent voir et contribuer',
             ),
-            activeColor: Colors.blue,
-            tileColor: Theme.of(context).brightness == Brightness.dark
-                ? Colors.grey[800]
-                : null,
+            activeColor: Colors.red[900], // Changed to match theme
           );
         }).toList(),
       ],
     );
   }
 
+  void _navigateToHome(BuildContext context) {
+    try {
+      Routemaster.of(context).push('/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur de navigation: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios,
-              color: isDarkMode
-                  ? Colors.white
-                  : Colors
-                      .white), // Icône blanche pour contraster avec le fond rouge
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          onPressed: () => _navigateToHome(context), // Navigate to /home
         ),
-        title: Text('Modifier la Communauté',
-            style: TextStyle(
-                color: Colors
-                    .white)), // Texte blanc pour contraster avec le fond rouge
+        title: const Text(
+          'Modifier la Communauté',
+          style: TextStyle(color: Colors.white),
+        ),
         centerTitle: false,
         actions: [
           TextButton(
             onPressed: _isLoading ? null : _saveChanges,
-            child: Text(
+            child: const Text(
               'Sauvegarder',
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize:
-                      16), // Texte blanc pour contraster avec le fond rouge
+              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           ),
         ],
-        backgroundColor: Colors.red, // Changer la couleur de l'AppBar en rouge
+        backgroundColor: Colors.red[900], // Consistent with theme
         elevation: 0,
       ),
       body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-                color: Colors.blue,
-                strokeWidth: 2.0,
-              ),
-            )
+          ? const Center(child: CircularProgressIndicator(color: Colors.red))
           : Padding(
               padding: _padding,
               child: SingleChildScrollView(
@@ -373,11 +348,14 @@ class _EditCommunityScreenState extends State<EditCommunityScreen> {
                     _buildThemeSection(),
                     const SizedBox(height: 16),
                     _buildCommunityTypeSection(),
-                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: 0, // Default to "Accueil"
+        onTap: (index) {}, // Required but unused; navigation handled internally
+      ),
     );
   }
 }

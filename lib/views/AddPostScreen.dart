@@ -107,7 +107,10 @@ class _AddPostScreenState extends State<AddPostScreen> {
         elevation: 1,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Colors.black87),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            // Naviguer vers la page d'accueil (Home) au lieu de simplement fermer l'écran
+            Routemaster.of(context).push('/home');
+          },
         ),
         title: const Text(
           'Créer une publication',

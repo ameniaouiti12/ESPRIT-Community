@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:routemaster/routemaster.dart';
+import 'package:esprit/Views/NavBar.dart'; // Import CustomNavigationBar (adjust path if needed)
 
 class CreateCommunityScreen extends StatefulWidget {
-  final int step; // Étape actuelle (1, 2 ou 3)
+  final int step; // Current step (1, 2, or 3)
   final String? communityName;
   final String? description;
   final List<String>? selectedThemes;
-  final String?
-      communityType; // Nouveau : type de communauté (Public, Restreinte, Privée)
-  final bool? isSensitive; // Nouveau : option sensible (18+)
+  final String? communityType; // Community type (Public, Restricted, Private)
+  final bool? isSensitive; // Sensitive content option (18+)
 
   const CreateCommunityScreen({
     super.key,
@@ -27,13 +28,13 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
     with SingleTickerProviderStateMixin {
   late TextEditingController communityNameController;
   late TextEditingController descriptionController;
-  List<String> selectedThemes = []; // Liste des thèmes sélectionnés
-  String? communityType; // Nouveau : type de communauté
-  bool isSensitive = false; // Nouveau : option sensible (18+)
+  List<String> selectedThemes = [];
+  String? communityType;
+  bool isSensitive = false;
   bool isLoading = false;
   late AnimationController _animationController;
 
-  // Liste des thèmes avec sous-catégories
+  // List of themes with subcategories
   final Map<String, List<String>> themes = {
     'Actualités et politique': ['Actualités', 'Activisme', 'Politique'],
     'Affaires et finances': [
@@ -45,7 +46,6 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
     ],
     'Anime et cosplay': ['Anime et Mangas', 'Cosplay'],
     'Art': ['Art'],
-    // Ajoute d'autres thèmes si nécessaire
   };
 
   @override
@@ -61,8 +61,8 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
     descriptionController =
         TextEditingController(text: widget.description ?? '');
     selectedThemes = widget.selectedThemes ?? [];
-    communityType = widget.communityType; // Initialiser le type de communauté
-    isSensitive = widget.isSensitive ?? false; // Initialiser l'option sensible
+    communityType = widget.communityType;
+    isSensitive = widget.isSensitive ?? false;
   }
 
   @override
@@ -93,19 +93,14 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
 
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() => isLoading = false);
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                CreateCommunityScreen(
+          MaterialPageRoute(
+            builder: (context) => CreateCommunityScreen(
               step: 2,
               communityName: communityName,
               description: description,
             ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
           ),
         );
       });
@@ -124,20 +119,15 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
 
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() => isLoading = false);
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondaryAnimation) =>
-                CreateCommunityScreen(
+          MaterialPageRoute(
+            builder: (context) => CreateCommunityScreen(
               step: 3,
               communityName: widget.communityName,
               description: widget.description,
               selectedThemes: selectedThemes,
             ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) {
-              return FadeTransition(opacity: animation, child: child);
-            },
           ),
         );
       });
@@ -156,14 +146,17 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
 
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() => isLoading = false);
-        print(
-            'Communauté créée : r/${widget.communityName} - ${widget.description} avec thèmes: $selectedThemes, type: $communityType, sensible: $isSensitive');
+
+        // Afficher un message de succès
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Communauté et paramètres créés avec succès !')),
+            content: Text('Communauté créée avec succès !'),
+            backgroundColor: Colors.green,
+          ),
         );
-        // Rediriger vers une page de confirmation ou fermer l’écran
-        Navigator.pop(context);
+
+        // Naviguer vers la page de la communauté (CommunityPage)
+        Routemaster.of(context).push('/community');
       });
     }
   }
@@ -197,22 +190,32 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
     });
   }
 
+  void _navigateToHome(BuildContext context) {
+    try {
+      Routemaster.of(context).push('/home');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur de navigation: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => _navigateToHome(context), // Navigate to /home
         ),
         title: Text(
-          '${widget.step} sur 3', // Changé pour 3 étapes
+          '${widget.step} sur 3',
           style: const TextStyle(color: Colors.black, fontSize: 16),
         ),
         actions: [
           TextButton(
             onPressed: isLoading ? null : navigateToNextStep,
-            child: Text(
+            child: const Text(
               'Suivant',
               style: TextStyle(color: Colors.blue, fontSize: 16),
             ),
@@ -229,7 +232,7 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
                 curve: Curves.easeInOut,
               ),
               child: SafeArea(
-                child: Padding(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -294,7 +297,8 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
                         const SizedBox(height: 16),
                         Text('Thèmes sélectionnés ${selectedThemes.length}/3'),
                         const SizedBox(height: 16),
-                        Expanded(
+                        SizedBox(
+                          height: 300,
                           child: ListView(
                             children: themes.entries.map((entry) {
                               return CheckboxListTile(
@@ -345,12 +349,16 @@ class _CreateCommunityScreenState extends State<CreateCommunityScreen>
                               'Uniquement les membres approuvés peuvent la voir et y contribuer'),
                         ),
                         const SizedBox(height: 16),
-                      ]
+                      ],
                     ],
                   ),
                 ),
               ),
             ),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: 0, // Default to "Accueil"
+        onTap: (index) {}, // Required but unused; navigation handled internally
+      ),
     );
   }
 }

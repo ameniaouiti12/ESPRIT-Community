@@ -1,7 +1,9 @@
-import 'package:esprit/views/CommunityListDrawer';
+import 'package:esprit/views/CommunityListDrawer.dart';
+import 'package:esprit/views/NavBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart'; // For system UI customization
 import 'mod_tools_screen.dart'; // Assuming this file exists
+import 'package:routemaster/routemaster.dart'; // For ProfileDrawer navigation
 
 class CommunityScreen extends StatefulWidget {
   final String name;
@@ -79,22 +81,21 @@ class _CommunityScreenState extends State<CommunityScreen>
   String? selectedCategory;
   bool isLoading = false;
   bool hasError = false;
-  late AnimationController
-      _animationController; // Keep as late, but ensure initialization
+  late AnimationController _animationController;
+  int _currentIndex = 1; // Default to "Communautés" (index 1)
 
   @override
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      vsync:
-          this, // Use 'this' as the SingleTickerProviderStateMixin provides vsync
+      vsync: this,
       duration: const Duration(milliseconds: 500),
-    )..forward(); // Chain forward to start the animation immediately
+    )..forward();
   }
 
   @override
   void dispose() {
-    _animationController.dispose(); // Dispose to prevent memory leaks
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -125,14 +126,13 @@ class _CommunityScreenState extends State<CommunityScreen>
       isLoading = true;
       hasError = false;
     });
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
     setState(() {
       isLoading = false;
-      // Simulate potential error (e.g., 20% chance)
       if (DateTime.now().second % 5 == 0) {
         hasError = true;
       } else {
-        mockCommunities.shuffle(); // Refresh with shuffled data
+        mockCommunities.shuffle();
       }
     });
   }
@@ -152,6 +152,12 @@ class _CommunityScreenState extends State<CommunityScreen>
       };
       return categoryMap[selectedCategory]!.contains(community['name']);
     }).toList();
+  }
+
+  void _onNavBarTap(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
   }
 
   @override
@@ -192,18 +198,23 @@ class _CommunityScreenState extends State<CommunityScreen>
           ),
           Padding(
             padding: const EdgeInsets.only(right: 8.0),
-            child: Image.network(
-              'https://www.redditstatic.com/desktop2x/img/favicon/favicon-32x32.png',
-              width: 32,
-              height: 32,
+            child: GestureDetector(
+              onTap: () {
+                Scaffold.of(context).openEndDrawer(); // Open ProfileDrawer
+              },
+              child: Image.asset(
+                'assets/avatar.png',
+                width: 32,
+                height: 32,
+              ),
             ),
           ),
         ],
         backgroundColor: Colors.red[900],
         elevation: 0,
       ),
-      drawer:
-          const CommunityListDrawer(), // Replace the existing Drawer with CommunityListDrawer
+      drawer: const CommunityListDrawer(), // Left-side drawer
+      endDrawer: const ProfileDrawer(), // Right-side drawer for profile
       backgroundColor: Colors.grey[100],
       body: RefreshIndicator(
         onRefresh: refreshCommunities,
@@ -218,7 +229,6 @@ class _CommunityScreenState extends State<CommunityScreen>
                   )
                 : Column(
                     children: [
-                      // Thematic Categories
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: SizedBox(
@@ -261,9 +271,8 @@ class _CommunityScreenState extends State<CommunityScreen>
                           ),
                         ),
                       ),
-                      // Recommended Communities
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
                         child: Text(
                           'Recommandées pour toi',
                           style: TextStyle(
@@ -372,6 +381,10 @@ class _CommunityScreenState extends State<CommunityScreen>
                     ],
                   ),
       ),
+      bottomNavigationBar: CustomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: _onNavBarTap,
+      ),
     );
   }
 }
@@ -459,5 +472,81 @@ class CommunitySearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildSuggestions(BuildContext context) {
     return buildResults(context);
+  }
+}
+
+// Profile Drawer Widget (kept as provided)
+class ProfileDrawer extends StatelessWidget {
+  const ProfileDrawer({super.key});
+
+  void navigateToUserProfile(BuildContext context) {
+    Routemaster.of(context).push('/Profil');
+  }
+
+  void navigateToCreateCommunity(BuildContext context) {
+    Routemaster.of(context).push('/create-community');
+  }
+
+  void navigateToHistory(BuildContext context) {
+    Routemaster.of(context).push('/history');
+  }
+
+  void navigateToSettings(BuildContext context) {
+    Routemaster.of(context).push('/settings');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SafeArea(
+        child: Column(
+          children: [
+            const CircleAvatar(
+              backgroundColor: Colors.grey, // Placeholder avatar
+              radius: 70,
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Ameni', // Static username
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 10),
+            const Divider(),
+            ListTile(
+              title: const Text('Profil'),
+              leading: Icon(
+                Icons.person,
+                color: Colors.red[900],
+              ),
+              onTap: () => navigateToUserProfile(context),
+            ),
+            ListTile(
+              title: const Text('Créer une communauté'),
+              leading: Icon(
+                Icons.add_circle,
+                color: Colors.red[900],
+              ),
+              onTap: () => navigateToCreateCommunity(context),
+            ),
+            ListTile(
+              title: const Text('Historique'),
+              leading: Icon(
+                Icons.history,
+                color: Colors.red[900],
+              ),
+              onTap: () => navigateToHistory(context),
+            ),
+            ListTile(
+              title: const Text('Paramètres'),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.red[900],
+              ),
+              onTap: () => navigateToSettings(context),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
