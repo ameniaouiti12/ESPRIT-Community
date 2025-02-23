@@ -196,17 +196,15 @@ class _CommunityScreenState extends State<CommunityScreen>
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: GestureDetector(
-              onTap: () {
+          Builder(
+            builder: (context) => IconButton(
+              icon: const CircleAvatar(
+                backgroundImage:
+                    AssetImage('assets/ameni.jpeg'), // Updated to Ameni's image
+              ),
+              onPressed: () {
                 Scaffold.of(context).openEndDrawer(); // Open ProfileDrawer
               },
-              child: Image.asset(
-                'assets/avatar.png',
-                width: 32,
-                height: 32,
-              ),
             ),
           ),
         ],

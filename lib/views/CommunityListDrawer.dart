@@ -64,22 +64,25 @@ class _CommunityListDrawerState extends State<CommunityListDrawer> {
                   onTap: () => navigateToCreateCommunity(context),
                 ),
                 ...yourCommunities.map((community) => ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(_getImageForCommunity(community)),
-                    radius: 16,
-                  ),
-                  title: Text(community),
-                  trailing: IconButton(
-                    icon: Icon(
-                      _favoriteCommunities[community]!
-                          ? Icons.star
-                          : Icons.star_border,
-                      color: _favoriteCommunities[community]! ? Colors.yellow : Colors.grey,
-                    ),
-                    onPressed: () => toggleFavorite(community),
-                  ),
-                  onTap: () => navigateToCommunity(context, community),
-                )),
+                      leading: CircleAvatar(
+                        backgroundImage:
+                            AssetImage(_getImageForCommunity(community)),
+                        radius: 16,
+                      ),
+                      title: Text(community),
+                      trailing: IconButton(
+                        icon: Icon(
+                          _favoriteCommunities[community]!
+                              ? Icons.star
+                              : Icons.star_border,
+                          color: _favoriteCommunities[community]!
+                              ? Colors.yellow
+                              : Colors.grey,
+                        ),
+                        onPressed: () => toggleFavorite(community),
+                      ),
+                      onTap: () => navigateToCommunity(context, community),
+                    )),
               ],
             ),
             // All Communities Section (Single Link)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:esprit/Views/NavBar.dart'; // Import CustomNavigationBar (adjust path if needed)
-import 'package:routemaster/routemaster.dart'; // Required for navigation
+import 'package:esprit/Views/NavBar.dart'; // Adjust path if needed
+import 'package:routemaster/routemaster.dart';
+import 'dart:async';
 
 class PodcastScreen extends StatelessWidget {
   const PodcastScreen({super.key});
@@ -49,10 +50,7 @@ class PodcastScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            // Naviguer vers la page d'accueil (Home) au lieu de simplement fermer l'écran
-            Routemaster.of(context).push('/home');
-          },
+          onPressed: () => Routemaster.of(context).push('/home'),
         ),
         title: const Text(
           "Podcasts",
@@ -64,14 +62,15 @@ class PodcastScreen extends StatelessWidget {
         ),
       ),
       body: ListView.builder(
+        padding: const EdgeInsets.symmetric(vertical: 8),
         itemCount: hosts.length,
         itemBuilder: (context, index) {
           return PodcastHostTile(host: hosts[index]);
         },
       ),
       bottomNavigationBar: CustomNavigationBar(
-        currentIndex: 4, // Set to "Podcast" index
-        onTap: (index) {}, // Required but unused; navigation handled internally
+        currentIndex: 4,
+        onTap: (index) {},
       ),
     );
   }
@@ -91,12 +90,15 @@ class PodcastHostTile extends StatelessWidget {
         return Container(
           height: MediaQuery.of(context).size.height * 0.7,
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-            border: Border.all(color: Colors.red[900]!, width: 2),
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Colors.red[900]!, Colors.red[700]!],
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(25)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withOpacity(0.2),
                 blurRadius: 15,
                 spreadRadius: 5,
                 offset: const Offset(0, -2),
@@ -105,14 +107,13 @@ class PodcastHostTile extends StatelessWidget {
           ),
           child: SingleChildScrollView(
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  width: 50,
-                  height: 5,
-                  margin: const EdgeInsets.only(top: 10),
+                  width: 60,
+                  height: 6,
+                  margin: const EdgeInsets.only(top: 12),
                   decoration: BoxDecoration(
-                    color: Colors.red[900],
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -122,15 +123,17 @@ class PodcastHostTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           CircleAvatar(
-                            radius: 35,
-                            backgroundColor: Colors.red[900],
+                            radius: 40,
+                            backgroundColor: Colors.white,
                             child: Text(
                               host.name[0],
-                              style: const TextStyle(
-                                  color: Colors.white, fontSize: 32),
+                              style: TextStyle(
+                                color: Colors.red[900],
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 16),
@@ -140,17 +143,16 @@ class PodcastHostTile extends StatelessWidget {
                               Text(
                                 host.name,
                                 style: const TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  fontSize: 26,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
                                 host.username,
                                 style: TextStyle(
-                                  color: Colors.grey[700],
+                                  color: Colors.white70,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w400,
                                 ),
                               ),
                             ],
@@ -161,7 +163,7 @@ class PodcastHostTile extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[100],
+                          color: Colors.white.withOpacity(0.9),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Column(
@@ -173,8 +175,7 @@ class PodcastHostTile extends StatelessWidget {
                             const SizedBox(height: 12),
                             _buildInfoRow("Durée", host.duration),
                             const SizedBox(height: 12),
-                            _buildInfoRow(
-                                "Auditeurs", "${host.listeners} en ligne"),
+                            _buildInfoRow("Auditeurs", "${host.listeners} en ligne"),
                           ],
                         ),
                       ),
@@ -182,14 +183,14 @@ class PodcastHostTile extends StatelessWidget {
                       const Text(
                         "Participants",
                         style: TextStyle(
-                          color: Colors.black,
+                          color: Colors.white,
                           fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 12),
                       SizedBox(
-                        height: 60,
+                        height: 70,
                         child: ListView(
                           scrollDirection: Axis.horizontal,
                           children: [
@@ -203,29 +204,28 @@ class PodcastHostTile extends StatelessWidget {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[900],
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.red[900],
                           minimumSize: const Size(double.infinity, 56),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          elevation: 2,
+                          elevation: 5,
                         ),
                         onPressed: () {
                           Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  PodcastRoomScreen(host: host),
+                              builder: (context) => PodcastRoomScreen(host: host),
                             ),
                           );
                         },
                         child: const Text(
                           "Rejoindre le podcast",
                           style: TextStyle(
-                            color: Colors.white,
                             fontSize: 18,
-                            fontWeight: FontWeight.w600,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -249,7 +249,7 @@ class PodcastHostTile extends StatelessWidget {
           style: TextStyle(
             color: Colors.red[900],
             fontSize: 16,
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.bold,
           ),
         ),
         Expanded(
@@ -258,7 +258,6 @@ class PodcastHostTile extends StatelessWidget {
             style: const TextStyle(
               color: Colors.black87,
               fontSize: 16,
-              fontWeight: FontWeight.w400,
             ),
           ),
         ),
@@ -270,11 +269,11 @@ class PodcastHostTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(right: 12),
       child: CircleAvatar(
-        radius: 25,
-        backgroundColor: Colors.red[900],
+        radius: 30,
+        backgroundColor: Colors.white.withOpacity(0.9),
         child: Text(
           initial,
-          style: const TextStyle(color: Colors.white, fontSize: 20),
+          style: TextStyle(color: Colors.red[900], fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -282,58 +281,116 @@ class PodcastHostTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: Colors.red[900]!, width: 1.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            spreadRadius: 2,
-            offset: const Offset(0, 2),
+    return GestureDetector(
+      onTap: () => _showPodcastInfo(context),
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.red[50]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-        ],
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        onTap: () => _showPodcastInfo(context),
-        leading: CircleAvatar(
-          backgroundColor: Colors.red[900],
-          radius: 25,
-          child: Text(
-            host.name[0],
-            style: const TextStyle(color: Colors.white, fontSize: 20),
-          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red[200]!.withOpacity(0.3),
+              blurRadius: 10,
+              spreadRadius: 2,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        title: Text(
-          host.name,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 30,
+              backgroundColor: Colors.red[900],
+              child: Text(
+                host.name[0],
+                style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    host.name,
+                    style: const TextStyle(
+                      color: Colors.black87,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "${host.username} • ${host.topic}",
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.headphones, size: 16, color: Colors.red[900]),
+                      const SizedBox(width: 4),
+                      Text(
+                        "${host.listeners} en ligne",
+                        style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.mic, color: Colors.red[900], size: 30),
+          ],
         ),
-        subtitle: Text(
-          "${host.username} • ${host.topic}",
-          style: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-        trailing: Icon(Icons.mic, color: Colors.red[900], size: 28),
       ),
     );
   }
 }
 
-class PodcastRoomScreen extends StatelessWidget {
+class PodcastRoomScreen extends StatefulWidget {
   final PodcastHost host;
 
   const PodcastRoomScreen({required this.host});
+
+  @override
+  _PodcastRoomScreenState createState() => _PodcastRoomScreenState();
+}
+
+class _PodcastRoomScreenState extends State<PodcastRoomScreen> {
+  late Duration _elapsedTime;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Start timer from 13 minutes ago
+    _elapsedTime = const Duration(minutes: 13);
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _elapsedTime = _elapsedTime + const Duration(seconds: 1);
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  String _formatDuration(Duration duration) {
+    final minutes = duration.inMinutes.toString().padLeft(2, '0');
+    final seconds = (duration.inSeconds % 60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -345,9 +402,12 @@ class PodcastRoomScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red[900],
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(20)),
+                gradient: LinearGradient(
+                  colors: [Colors.red[900]!, Colors.red[700]!],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(20)),
               ),
               child: Row(
                 children: [
@@ -357,10 +417,10 @@ class PodcastRoomScreen extends StatelessWidget {
                   ),
                   Expanded(
                     child: Text(
-                      "${host.name}'s Live",
+                      "${widget.host.name}'s Live",
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 24,
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
@@ -377,49 +437,76 @@ class PodcastRoomScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CircleAvatar(
-                      radius: 60,
+                      radius: 70,
                       backgroundColor: Colors.red[900],
                       child: Text(
-                        host.name[0],
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 48),
+                        widget.host.name[0],
+                        style: const TextStyle(color: Colors.white, fontSize: 56, fontWeight: FontWeight.bold),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Text(
-                      "EN DIRECT",
-                      style: TextStyle(
-                        color: Colors.red[900],
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 2,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.red[100],
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            "EN DIRECT",
+                            style: TextStyle(
+                              color: Colors.red[900],
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          "depuis ${_formatDuration(_elapsedTime)}",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      host.topic,
+                      widget.host.topic,
                       style: const TextStyle(
                         color: Colors.black,
-                        fontSize: 28,
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      "${host.listeners} auditeurs en ligne",
+                      "${widget.host.listeners} auditeurs en ligne",
                       style: TextStyle(color: Colors.grey[600], fontSize: 16),
                     ),
                     const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.mic, color: Colors.red[900], size: 30),
+                        IconButton(
+                          icon: Icon(Icons.mic, color: Colors.red[900], size: 36),
+                          onPressed: () {},
+                        ),
                         const SizedBox(width: 20),
-                        Icon(Icons.headset, color: Colors.grey, size: 30),
+                        IconButton(
+                          icon: const Icon(Icons.headset, color: Colors.grey, size: 36),
+                          onPressed: () {},
+                        ),
                         const SizedBox(width: 20),
-                        Icon(Icons.chat_bubble_outline,
-                            color: Colors.grey, size: 30),
+                        IconButton(
+                          icon: const Icon(Icons.chat_bubble_outline, color: Colors.grey, size: 36),
+                          onPressed: () {},
+                        ),
                       ],
                     ),
                   ],
@@ -431,16 +518,17 @@ class PodcastRoomScreen extends StatelessWidget {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red[900],
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 56),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(28),
                   ),
+                  elevation: 5,
                 ),
                 onPressed: () => Navigator.pop(context),
                 child: const Text(
                   "Quitter le live",
                   style: TextStyle(
-                    color: Colors.white,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

@@ -1,3 +1,4 @@
+import 'package:esprit/views/LeaderboardScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 
@@ -5,7 +6,8 @@ class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
 
   void navigateToUserProfile(BuildContext context) {
-    Routemaster.of(context).push('/Profil'); // Navigue vers la route /Profil
+    // Navigation avec Routemaster
+    Routemaster.of(context).push('/Profil');
   }
 
   void navigateToCreateCommunity(BuildContext context) {
@@ -21,7 +23,12 @@ class ProfileDrawer extends StatelessWidget {
   }
 
   void navigateToClassement(BuildContext context) {
-    Routemaster.of(context).push('/classement');
+    // 🔹 Suppression de `const`
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => LeaderboardScreen()), // ✅ Correction
+    );
   }
 
   @override
@@ -39,10 +46,11 @@ class ProfileDrawer extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              // User Avatar and Name
+              // User Avatar and Name with Corrected Image Asset
               CircleAvatar(
-                backgroundColor: Colors.grey,
                 radius: 70,
+                backgroundImage:
+                    const AssetImage('assets/ameni.jpeg'), // Correct asset path
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Container(
@@ -58,7 +66,7 @@ class ProfileDrawer extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               const Text(
-                'Ameni',
+                'Ameni Aouiti',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 10),
@@ -67,7 +75,7 @@ class ProfileDrawer extends StatelessWidget {
               // Enhanced Ranking Section
               GestureDetector(
                 onTap: () => navigateToClassement(
-                    context), // Navigation vers le classement
+                    context), // 🔹 Navigation vers LeaderboardScreen
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 16.0, vertical: 12.0),

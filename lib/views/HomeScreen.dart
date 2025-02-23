@@ -27,9 +27,22 @@ class _HomeScreenState extends State<HomeScreen> {
       'title': '🔥 La phase 2 de C-ool-algo-rythm arrive à grands pas ! 🔥',
       'content':
           '📅 26 février 2025\n⏰ 13h\n📍 Amphithéâtre Bloc G\nRejoignez-nous pour la phase 2 de C-ool-algo-rythm et plongez dans l\'innovation ! 🚀🏆\n#CooLAlgoRythm #Phase2 #Innovation #EspritTech\n@Honoris United Universities',
-      'image': 'assets/event.jpg', // Chemin corrigé avec 'assets/'
+      'image': 'assets/event.jpg',
       'upvotes': 35,
       'downvotes': 0,
+      'comments': [],
+      'isUpvoted': false,
+      'isDownvoted': false,
+    },
+    {
+      'community': 'ESPRIT International',
+      'avatar': 'assets/Esprit.jpeg',
+      'title': 'Partenariat avec Beijing Polytechnic',
+      'content':
+          '𝗟𝗲 𝗴𝗿𝗼𝘂𝗽𝗲 𝗘𝘀𝗽𝗿𝗶𝘁 𝗮 𝗲𝘂 𝗹’𝗵𝗼𝗻𝗻𝗲𝘂𝗿 𝗱’𝗮𝗰𝗰𝘂𝗲𝗶𝗹𝗹𝗶𝗿 𝘂𝗻𝗲 𝗱𝗲́𝗹𝗲́𝗴𝗮𝘁𝗶𝗼𝗻 𝗱𝗲 𝗕𝗲𝗶𝗷𝗶𝗻𝗴 𝗣𝗼𝗹𝘆𝘁𝗲𝗰𝗵𝗻𝗶𝗰, une université chinoise de renom dans le cadre du renouvellement d’un partenariat stratégique entre nos deux universités.\nCe partenariat ouvre la voie à des échanges académiques, culturels et scientifiques prometteurs pour nos étudiants et enseignants.\n#PartenariatInternational #CoopérationAcadémique\nHonoris United Universities',
+      'image': 'assets/taher.jpg', // Assuming the image is named taher.jpeg
+      'upvotes': 42,
+      'downvotes': 1,
       'comments': [],
       'isUpvoted': false,
       'isDownvoted': false,
@@ -52,6 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
         for (var post in communityPosts)
           if (post['image'] != null)
             precacheImage(AssetImage(post['image']), context),
+        precacheImage(const AssetImage('assets/ameni.jpeg'),
+            context), // Preload Ameni's image
+        precacheImage(const AssetImage('assets/taher.jpeg'),
+            context), // Preload Taher's image
       ]);
       setState(() {
         _isLoading = false; // Chargement terminé
@@ -313,7 +330,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Builder(builder: (context) {
               return IconButton(
-                icon: const CircleAvatar(backgroundColor: Colors.grey),
+                icon: const CircleAvatar(
+                  backgroundImage:
+                      AssetImage('assets/ameni.jpeg'), // Added Ameni's image
+                ),
                 onPressed: () => displayEndDrawer(context),
               );
             }),

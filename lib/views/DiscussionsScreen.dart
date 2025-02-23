@@ -44,7 +44,8 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       IconButton(
-                        icon: Icon(Icons.close, color: Colors.grey[700], size: 24),
+                        icon: Icon(Icons.close,
+                            color: Colors.grey[700], size: 24),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -59,27 +60,33 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                   ),
                   const SizedBox(height: 20),
                   CheckboxListTile(
-                    title: const Text('Canaux de discussion', style: TextStyle(fontSize: 16)),
+                    title: const Text('Canaux de discussion',
+                        style: TextStyle(fontSize: 16)),
                     value: _chatChannels,
-                    onChanged: (value) => setState(() => _chatChannels = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _chatChannels = value ?? false),
                     activeColor: Colors.red[800],
                     checkColor: Colors.white,
                     tileColor: Colors.grey[50],
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   CheckboxListTile(
-                    title: const Text('Discussions de groupe', style: TextStyle(fontSize: 16)),
+                    title: const Text('Discussions de groupe',
+                        style: TextStyle(fontSize: 16)),
                     value: _groupDiscussions,
-                    onChanged: (value) => setState(() => _groupDiscussions = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _groupDiscussions = value ?? false),
                     activeColor: Colors.red[800],
                     checkColor: Colors.white,
                     tileColor: Colors.grey[50],
                     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                   ),
                   CheckboxListTile(
-                    title: const Text('Discussions instantanées', style: TextStyle(fontSize: 16)),
+                    title: const Text('Discussions instantanées',
+                        style: TextStyle(fontSize: 16)),
                     value: _instantDiscussions,
-                    onChanged: (value) => setState(() => _instantDiscussions = value ?? false),
+                    onChanged: (value) =>
+                        setState(() => _instantDiscussions = value ?? false),
                     activeColor: Colors.red[800],
                     checkColor: Colors.white,
                     tileColor: Colors.grey[50],
@@ -95,10 +102,13 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                       backgroundColor: Colors.red[800],
                       foregroundColor: Colors.white,
                       minimumSize: const Size(200, 50),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       elevation: 3,
                     ),
-                    child: const Text('Appliquer les filtres', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                    child: const Text('Appliquer les filtres',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
@@ -150,13 +160,18 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.black87),
-            onPressed: () => _showFilterBottomSheet(context),
+            icon: const Icon(Icons.search, color: Colors.black87),
+            onPressed: () {
+              // TODO: Implement search functionality if needed
+            },
           ),
           Builder(
             builder: (context) {
               return IconButton(
-                icon: const CircleAvatar(backgroundColor: Colors.grey),
+                icon: const CircleAvatar(
+                  backgroundImage: AssetImage(
+                      'assets/ameni.jpeg'), // Updated to Ameni's image
+                ),
                 onPressed: () => Scaffold.of(context).openEndDrawer(),
               );
             },
@@ -184,7 +199,10 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                   onPressed: () {},
                   child: Text(
                     'Voir tout',
-                    style: TextStyle(color: Colors.red[800], fontSize: 16, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        color: Colors.red[800],
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500),
                   ),
                 ),
               ],
@@ -204,14 +222,16 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                           title: 'ESPRIT Ingénieur',
                           subtitle: '150 messages récents',
                           icon: Icons.engineering,
-                          onTap: () => _navigateToGroupDiscussion(context, 'ESPRIT Ingénieur'),
+                          onTap: () => _navigateToGroupDiscussion(
+                              context, 'ESPRIT Ingénieur'),
                         ),
                         const SizedBox(width: 12),
                         _buildChannelTile(
                           title: 'ESPRIT Business School',
                           subtitle: 'Récemment visité',
                           icon: Icons.business,
-                          onTap: () => _navigateToGroupDiscussion(context, 'ESPRIT Business School'),
+                          onTap: () => _navigateToGroupDiscussion(
+                              context, 'ESPRIT Business School'),
                           timestamp: '18:13',
                         ),
                       ],
@@ -250,11 +270,15 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red[800],
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 3,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 24, vertical: 12),
                         ),
-                        child: const Text('Explorer les canaux', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                        child: const Text('Explorer les canaux',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600)),
                       ),
                     ],
                   ),
@@ -361,11 +385,92 @@ class _DiscussionsScreenState extends State<DiscussionsScreen> {
   }
 }
 
+// Updated ProfileDrawer with ameni.jpeg
+class ProfileDrawer extends StatelessWidget {
+  const ProfileDrawer({super.key});
+
+  void navigateToUserProfile(BuildContext context) {
+    Routemaster.of(context).push('/Profil');
+  }
+
+  void navigateToCreateCommunity(BuildContext context) {
+    Routemaster.of(context).push('/create-community');
+  }
+
+  void navigateToHistory(BuildContext context) {
+    Routemaster.of(context).push('/history');
+  }
+
+  void navigateToSettings(BuildContext context) {
+    Routemaster.of(context).push('/settings');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: Container(
+        color: Colors.white,
+        child: SafeArea(
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 70,
+                backgroundImage: const AssetImage(
+                    'assets/ameni.jpeg'), // Updated to Ameni's image
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.green,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Ameni',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 10),
+              const Divider(),
+              ListTile(
+                title: const Text('Profil'),
+                leading: Icon(Icons.person, color: Colors.red[800]),
+                onTap: () => navigateToUserProfile(context),
+              ),
+              ListTile(
+                title: const Text('Créer une communauté'),
+                leading: Icon(Icons.add_circle, color: Colors.red[800]),
+                onTap: () => navigateToCreateCommunity(context),
+              ),
+              ListTile(
+                title: const Text('Historique'),
+                leading: Icon(Icons.history, color: Colors.red[800]),
+                onTap: () => navigateToHistory(context),
+              ),
+              ListTile(
+                title: const Text('Paramètres'),
+                leading: Icon(Icons.settings, color: Colors.red[800]),
+                onTap: () => navigateToSettings(context),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class NewDiscussionRoomScreen extends StatefulWidget {
   const NewDiscussionRoomScreen({super.key});
 
   @override
-  State<NewDiscussionRoomScreen> createState() => _NewDiscussionRoomScreenState();
+  State<NewDiscussionRoomScreen> createState() =>
+      _NewDiscussionRoomScreenState();
 }
 
 class _NewDiscussionRoomScreenState extends State<NewDiscussionRoomScreen> {
@@ -547,7 +652,18 @@ class _GroupDiscussionScreenState extends State<GroupDiscussionScreen> {
           crossAxisCount: 5,
           shrinkWrap: true,
           children: [
-            for (var emoji in ['😊', '😂', '😢', '👍', '👎', '❤️', '😎', '🤔', '😍', '😱'])
+            for (var emoji in [
+              '😊',
+              '😂',
+              '😢',
+              '👍',
+              '👎',
+              '❤️',
+              '😎',
+              '🤔',
+              '😍',
+              '😱'
+            ])
               GestureDetector(
                 onTap: () {
                   _sendEmoji(emoji);
@@ -612,7 +728,8 @@ class _GroupDiscussionScreenState extends State<GroupDiscussionScreen> {
                       if (message['type'] == 'text')
                         Text(
                           message['content'],
-                          style: const TextStyle(color: Colors.black87, fontSize: 16),
+                          style: const TextStyle(
+                              color: Colors.black87, fontSize: 16),
                         )
                       else if (message['type'] == 'image')
                         Image.file(
@@ -622,10 +739,10 @@ class _GroupDiscussionScreenState extends State<GroupDiscussionScreen> {
                           fit: BoxFit.cover,
                         )
                       else if (message['type'] == 'emoji')
-                          Text(
-                            message['content'],
-                            style: const TextStyle(fontSize: 24),
-                          ),
+                        Text(
+                          message['content'],
+                          style: const TextStyle(fontSize: 24),
+                        ),
                       const SizedBox(height: 4),
                       Text(
                         message['time'],
@@ -654,7 +771,8 @@ class _GroupDiscussionScreenState extends State<GroupDiscussionScreen> {
                         borderSide: BorderSide.none,
                       ),
                       suffixIcon: IconButton(
-                        icon: Icon(Icons.sentiment_satisfied, color: Colors.grey[600]),
+                        icon: Icon(Icons.sentiment_satisfied,
+                            color: Colors.grey[600]),
                         onPressed: () => _showEmojiPicker(context),
                       ),
                     ),

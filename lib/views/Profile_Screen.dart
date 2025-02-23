@@ -74,10 +74,10 @@ class ProfileScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 40,
-            backgroundColor: Colors.red,
-            child: Icon(Icons.person, size: 40, color: Colors.white),
+            backgroundImage:
+                const AssetImage('assets/ameni.jpeg'), // Added Ameni's image
           ),
           const SizedBox(height: 8),
           _buildOutlinedButton(
@@ -87,7 +87,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           const Text(
-            'Tiny-Process-2200',
+            'Ameni Aouiti', // Updated username
             style: TextStyle(
               color: Colors.white,
               fontSize: 20,
@@ -108,7 +108,7 @@ class ProfileScreen extends StatelessWidget {
             ],
           ),
           const Text(
-            'u/Tiny-Process-2200 • 1 karma • févr. 18, 2025',
+            'u/Ameni-Aouiti • 1 karma • févr. 18, 2025', // Updated username in handle
             style: TextStyle(color: Colors.white70, fontSize: 14),
           ),
           const Text(
