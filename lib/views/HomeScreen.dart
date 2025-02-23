@@ -16,8 +16,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _page = 0; // Track the current navigation index
+  int _page = 0;
   String? _selectedMenu;
+  bool _isLoading = true; // Indicateur de chargement initial
 
   final List<Map<String, dynamic>> communityPosts = [
     {
@@ -25,8 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
       'avatar': 'assets/Esprit.jpeg',
       'title': '🔥 La phase 2 de C-ool-algo-rythm arrive à grands pas ! 🔥',
       'content':
-      '📅 26 février 2025\n⏰ 13h\n📍 Amphithéâtre Bloc G\nRejoignez-nous pour la phase 2 de C-ool-algo-rythm et plongez dans l\'innovation ! 🚀🏆\n#CooLAlgoRythm #Phase2 #Innovation #EspritTech\n@Honoris United Universities',
-      'image': 'event.jpg',
+          '📅 26 février 2025\n⏰ 13h\n📍 Amphithéâtre Bloc G\nRejoignez-nous pour la phase 2 de C-ool-algo-rythm et plongez dans l\'innovation ! 🚀🏆\n#CooLAlgoRythm #Phase2 #Innovation #EspritTech\n@Honoris United Universities',
+      'image': 'assets/event.jpg', // Chemin corrigé avec 'assets/'
       'upvotes': 35,
       'downvotes': 0,
       'comments': [],
@@ -35,12 +36,48 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _preloadAssets();
+  }
+
+  Future<void> _preloadAssets() async {
+    try {
+      // Précharger les images pour éviter les blocages
+      await Future.wait([
+        precacheImage(const AssetImage('assets/esprit.png'), context),
+        for (var post in communityPosts)
+          precacheImage(AssetImage(post['avatar']), context),
+        for (var post in communityPosts)
+          if (post['image'] != null)
+            precacheImage(AssetImage(post['image']), context),
+      ]);
+      setState(() {
+        _isLoading = false; // Chargement terminé
+      });
+    } catch (e) {
+      print('Erreur lors du préchargement des assets: $e');
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
   void displayDrawer(BuildContext context) {
-    Scaffold.of(context).openDrawer();
+    try {
+      Scaffold.of(context).openDrawer();
+    } catch (e) {
+      print("Erreur lors de l'ouverture du drawer: $e");
+    }
   }
 
   void displayEndDrawer(BuildContext context) {
-    Scaffold.of(context).openEndDrawer();
+    try {
+      Scaffold.of(context).openEndDrawer();
+    } catch (e) {
+      print("Erreur lors de l'ouverture de l'end drawer: $e");
+    }
   }
 
   void onPageChanged(int index) {
@@ -56,10 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void startSearch(BuildContext context) {
-    showSearch(
-      context: context,
-      delegate: GenericSearchDelegate(),
-    );
+    showSearch(context: context, delegate: GenericSearchDelegate());
   }
 
   void toggleUpvote(int index) {
@@ -153,7 +187,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.save, color: Colors.black),
                 title: const Text('Enregistrer'),
                 onTap: () {
-                  // Implement save functionality
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Publication enregistrée')),
@@ -164,7 +197,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.block, color: Colors.black),
                 title: const Text('Bloquer le compte'),
                 onTap: () {
-                  // Implement block functionality
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Compte bloqué')),
@@ -175,7 +207,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.report, color: Colors.black),
                 title: const Text('Signaler'),
                 onTap: () {
-                  // Implement report functionality
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Signalement envoyé')),
@@ -186,7 +217,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.visibility_off, color: Colors.black),
                 title: const Text('Cacher'),
                 onTap: () {
-                  // Implement hide functionality
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Publication cachée')),
@@ -197,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.copy, color: Colors.black),
                 title: const Text('Copier le texte'),
                 onTap: () {
-                  // Implement copy text functionality
                   Clipboard.setData(ClipboardData(text: post['content']));
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -209,10 +238,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 leading: const Icon(Icons.share, color: Colors.black),
                 title: const Text('Crospublier dans la communauté'),
                 onTap: () {
-                  // Implement crosspost functionality
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Publication partagée dans la communauté')),
+                    const SnackBar(
+                        content:
+                            Text('Publication partagée dans la communauté')),
                   );
                 },
               ),
@@ -289,161 +319,169 @@ class _HomeScreenState extends State<HomeScreen> {
             }),
           ],
         ),
-        body: ListView.builder(
-          padding: const EdgeInsets.all(8.0),
-          itemCount: communityPosts.length,
-          itemBuilder: (context, index) {
-            final post = communityPosts[index];
-            return Card(
-              color: Colors.white,
-              elevation: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.red[900]!, width: 1),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage(post['avatar']),
-                          radius: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          post['community'],
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          icon: const Icon(Icons.more_vert, color: Colors.grey),
-                          onPressed: () => showPostOptions(context, index),
-                        ),
-                      ],
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ListView.builder(
+                padding: const EdgeInsets.all(8.0),
+                itemCount: communityPosts.length,
+                itemBuilder: (context, index) {
+                  final post = communityPosts[index];
+                  return Card(
+                    color: Colors.white,
+                    elevation: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: Colors.red[900]!, width: 1),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      post['title'],
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red[900],
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      post['content'],
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                      ),
-                    ),
-                    if (post['image'] != null) ...[
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () => showFullImage(context, post['image']),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Stack(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Image.asset(
-                                post['image'],
-                                width: double.infinity,
-                                height: 200,
-                                fit: BoxFit.cover,
+                              CircleAvatar(
+                                backgroundImage: AssetImage(post['avatar']),
+                                radius: 20,
                               ),
-                              Positioned(
-                                bottom: 8,
-                                right: 8,
-                                child: Icon(
-                                  Icons.zoom_in,
+                              const SizedBox(width: 8),
+                              Text(
+                                post['community'],
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                   color: Colors.black,
-                                  size: 24,
                                 ),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                icon: const Icon(Icons.more_vert,
+                                    color: Colors.grey),
+                                onPressed: () =>
+                                    showPostOptions(context, index),
                               ),
                             ],
                           ),
-                        ),
-                      ),
-                    ],
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.arrow_upward,
-                                color: post['isUpvoted']
-                                    ? Colors.red[900]
-                                    : Colors.grey,
+                          const SizedBox(height: 12),
+                          Text(
+                            post['title'],
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red[900],
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            post['content'],
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                          ),
+                          if (post['image'] != null) ...[
+                            const SizedBox(height: 12),
+                            GestureDetector(
+                              onTap: () =>
+                                  showFullImage(context, post['image']),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Stack(
+                                  children: [
+                                    Image.asset(
+                                      post['image'],
+                                      width: double.infinity,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    Positioned(
+                                      bottom: 8,
+                                      right: 8,
+                                      child: Icon(
+                                        Icons.zoom_in,
+                                        color: Colors.black,
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              onPressed: () => toggleUpvote(index),
-                            ),
-                            Text(
-                              '${post['upvotes']}',
-                              style: TextStyle(
-                                color: post['isUpvoted']
-                                    ? Colors.red[900]
-                                    : Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: Icon(
-                                Icons.arrow_downward,
-                                color: post['isDownvoted']
-                                    ? Colors.red[900]
-                                    : Colors.grey,
-                              ),
-                              onPressed: () => toggleDownvote(index),
-                            ),
-                            Text(
-                              '${post['downvotes']}',
-                              style: TextStyle(
-                                color: post['isDownvoted']
-                                    ? Colors.red[900]
-                                    : Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            IconButton(
-                              icon: const Icon(Icons.comment, color: Colors.grey),
-                              onPressed: () => showComments(context, index),
-                            ),
-                            Text(
-                              '${post['comments'].length}',
-                              style: const TextStyle(color: Colors.grey),
                             ),
                           ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.share, color: Colors.grey),
-                          onPressed: () => sharePost(context, index),
-                        ),
-                      ],
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.arrow_upward,
+                                      color: post['isUpvoted']
+                                          ? Colors.red[900]
+                                          : Colors.grey,
+                                    ),
+                                    onPressed: () => toggleUpvote(index),
+                                  ),
+                                  Text(
+                                    '${post['upvotes']}',
+                                    style: TextStyle(
+                                      color: post['isUpvoted']
+                                          ? Colors.red[900]
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.arrow_downward,
+                                      color: post['isDownvoted']
+                                          ? Colors.red[900]
+                                          : Colors.grey,
+                                    ),
+                                    onPressed: () => toggleDownvote(index),
+                                  ),
+                                  Text(
+                                    '${post['downvotes']}',
+                                    style: TextStyle(
+                                      color: post['isDownvoted']
+                                          ? Colors.red[900]
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  IconButton(
+                                    icon: const Icon(Icons.comment,
+                                        color: Colors.grey),
+                                    onPressed: () =>
+                                        showComments(context, index),
+                                  ),
+                                  Text(
+                                    '${post['comments'].length}',
+                                    style: const TextStyle(color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              IconButton(
+                                icon:
+                                    const Icon(Icons.share, color: Colors.grey),
+                                onPressed: () => sharePost(context, index),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
-            );
-          },
-        ),
         drawer: const CommunityListDrawer(),
         endDrawer: const ProfileDrawer(),
         backgroundColor: Colors.white,
         bottomNavigationBar: CustomNavigationBar(
           currentIndex: _page,
-          onTap: onPageChanged, // Pass the onPageChanged callback
+          onTap: onPageChanged,
         ),
       ),
     );
@@ -473,7 +511,11 @@ class GenericSearchDelegate extends SearchDelegate<String> {
       'name': 'wholesomememes',
       'description': 'Culture Internet'
     },
-    {'type': 'post', 'name': 'Flutter Tips', 'description': 'A post about Flutter'},
+    {
+      'type': 'post',
+      'name': 'Flutter Tips',
+      'description': 'A post about Flutter'
+    },
     {'type': 'user', 'name': 'user1', 'description': 'A user profile'},
     {'type': 'community', 'name': 'buccaneers', 'description': 'Pop culture'},
   ];
@@ -504,8 +546,8 @@ class GenericSearchDelegate extends SearchDelegate<String> {
   Widget buildResults(BuildContext context) {
     final filteredItems = searchItems
         .where((item) =>
-    item['name'].toLowerCase().contains(query.toLowerCase()) ||
-        item['description'].toLowerCase().contains(query.toLowerCase()))
+            item['name'].toLowerCase().contains(query.toLowerCase()) ||
+            item['description'].toLowerCase().contains(query.toLowerCase()))
         .toList();
 
     return Container(
@@ -571,7 +613,8 @@ class CommentSection extends StatefulWidget {
   final Map<String, dynamic> post;
   final Function(String) onAddComment;
 
-  const CommentSection({super.key, required this.post, required this.onAddComment});
+  const CommentSection(
+      {super.key, required this.post, required this.onAddComment});
 
   @override
   State<CommentSection> createState() => _CommentSectionState();
@@ -634,7 +677,8 @@ class _CommentSectionState extends State<CommentSection> {
                 itemCount: widget.post['comments'].length,
                 itemBuilder: (context, index) {
                   return Container(
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                     decoration: BoxDecoration(
                       border: Border(
                         bottom: BorderSide(color: Colors.red[900]!, width: 0.5),

@@ -1,14 +1,10 @@
-import 'package:esprit/auth/Splash_Screen';
-import 'package:esprit/auth/login_screen';
-import 'package:esprit/views/Settings_screen';
+import 'package:esprit/auth/Splash_Screen.dart';
+import 'package:esprit/auth/login_screen.dart';
 import 'package:esprit/views/add_mods_screen.dart';
 import 'package:esprit/views/community_screen.dart';
 import 'package:esprit/views/edit_community_screen.dart';
 import 'package:esprit/views/feed_screen.dart';
 import 'package:esprit/views/mod_tools_screen.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 import 'Views/AddPostScreen.dart';
@@ -27,17 +23,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Your App',
       theme: ThemeData(
-        primarySwatch: Colors.red, // Match your app's theme
+        primarySwatch: Colors.red,
       ),
       routerDelegate: RoutemasterDelegate(
         routesBuilder: (context) {
           return RouteMap(
             routes: {
-              '/': (route) => const MaterialPage(child: HomeScreen()), // Default route (home)
-              '/home': (route) => const MaterialPage(child: HomeScreen()), // Home route
-              '/add-post': (route) => const MaterialPage(child: AddPostScreen()), // Add post route
-              '/discuter': (route) => const MaterialPage(child: DiscussionsScreen()),// Add other routes as needed
-
+              '/': (route) => const MaterialPage(child: SplashScreen()),
+              '/login': (route) => const MaterialPage(child: LoginScreen()),
+              '/home': (route) => const MaterialPage(child: HomeScreen()),
+              '/add-post': (route) =>
+                  const MaterialPage(child: AddPostScreen()),
+              '/discuter': (route) =>
+                  const MaterialPage(child: DiscussionsScreen()),
             },
           );
         },

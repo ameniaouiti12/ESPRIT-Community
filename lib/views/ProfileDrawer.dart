@@ -33,9 +33,7 @@ class ProfileDrawer extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               'Ameni', // Static username
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 10),
             const Divider(),

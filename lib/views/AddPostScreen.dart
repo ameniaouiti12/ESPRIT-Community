@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'CommunitySearchScreen.dart';
 
@@ -33,10 +32,12 @@ class _AddPostScreenState extends State<AddPostScreen> {
   }
 
   void _publishPost() {
-    if (_selectedCommunity == 'Sélectionner une communauté' || _titleController.text.isEmpty) {
+    if (_selectedCommunity == 'Sélectionner une communauté' ||
+        _titleController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Veuillez sélectionner une communauté et entrer un titre'),
+          content:
+              Text('Veuillez sélectionner une communauté et entrer un titre'),
           backgroundColor: Colors.red,
         ),
       );
@@ -59,16 +60,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
       setState(() {
         _selectedCommunity = result;
       });
-    }
-  }
-
-  // Pick general files
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-    if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Fichier sélectionné : ${result.files.single.name}')),
-      );
     }
   }
 
@@ -96,7 +87,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   void _addPollOption() {
     setState(() {
-      _pollOptions.add(TextEditingController(text: 'Option ${_pollOptions.length + 1}'));
+      _pollOptions.add(
+          TextEditingController(text: 'Option ${_pollOptions.length + 1}'));
     });
   }
 
@@ -136,7 +128,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               ),
               child: const Text(
                 'Publier',
@@ -157,7 +150,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                 onTap: _selectCommunity,
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
@@ -169,7 +163,8 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       Text(
                         _selectedCommunity!,
                         style: TextStyle(
-                          color: _selectedCommunity == 'Sélectionner une communauté'
+                          color: _selectedCommunity ==
+                                  'Sélectionner une communauté'
                               ? Colors.grey[600]
                               : Colors.black87,
                           fontSize: 16,
@@ -268,19 +263,19 @@ class _AddPostScreenState extends State<AddPostScreen> {
                       ),
                       const SizedBox(height: 10),
                       ..._pollOptions.map((controller) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: TextField(
-                          controller: controller,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8),
-                              borderSide: BorderSide.none,
+                            padding: const EdgeInsets.only(bottom: 8.0),
+                            child: TextField(
+                              controller: controller,
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      )),
+                          )),
                       const SizedBox(height: 10),
                       TextButton(
                         onPressed: _addPollOption,
@@ -299,12 +294,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  // File Picker Icon
-                  _buildIconButton(
-                    icon: Icons.attach_file,
-                    tooltip: 'Ajouter un fichier',
-                    onPressed: _pickFile,
-                  ),
                   // Image Picker Icon
                   _buildIconButton(
                     icon: Icons.image,
@@ -317,7 +306,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
                     tooltip: 'Ajouter une vidéo',
                     onPressed: _pickVideo,
                   ),
-                  // Poll Icon (replaces List)
+                  // Poll Icon
                   _buildIconButton(
                     icon: Icons.poll,
                     tooltip: 'Ajouter un sondage',

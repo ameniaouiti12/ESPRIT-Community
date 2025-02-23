@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:routemaster/routemaster.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -33,22 +34,31 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Simulate an asynchronous task
-                Future.delayed(const Duration(seconds: 1), () {
-                  print("Login button pressed");
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black, // Button background color
-                foregroundColor: Colors.white, // Text color
-                minimumSize: const Size(double.infinity, 50), // Full width, fixed height
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Rounded corners
-                ),
-              ),
-              child: const Text('Se connecter'),
-            ),
+  onPressed: () {
+    // Simulate an asynchronous task (e.g., login API call)
+    Future.delayed(const Duration(seconds: 1), () {
+      try {
+        print("Login button pressed");
+        Routemaster.of(context).push('/home');
+      } catch (e, stackTrace) {
+        print("Erreur lors de la navigation vers /home: $e");
+        print(stackTrace);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e')),
+        );
+      }
+    });
+  },
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.black,
+    foregroundColor: Colors.white,
+    minimumSize: const Size(double.infinity, 50),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+  ),
+  child: const Text('Se connecter'),
+),
           ],
         ),
       ),

@@ -1,8 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
-import 'AddPostScreen.dart'; // Import the updated AddPostScreen
-import 'HomeScreen.dart';    // Import the HomeScreen (assuming it's in a file named HomeScreen.dart)
 
 class CustomNavigationBar extends StatefulWidget {
   final int currentIndex;
@@ -24,56 +21,38 @@ class _CustomNavigationBarState extends State<CustomNavigationBar> {
     return BottomNavigationBar(
       currentIndex: widget.currentIndex,
       onTap: (index) {
-        // Prevent navigating to the same screen when already on it
         if (index == widget.currentIndex) return;
+        widget.onTap(index);
 
         switch (index) {
-          case 0: // "Accueil" (Home) item
+          case 0:
             Routemaster.of(context).push('/home');
             break;
-          case 2: // "Créer" (Create) item
+          case 2:
             Routemaster.of(context).push('/add-post');
             break;
-          case 1:
-
           case 3:
-            Routemaster.of(context).push('/discuter');// "Discuter" item
-
-          case 4: // "Podcast" item
-            widget.onTap(index); // Delegate to parent for custom navigation logic
+            Routemaster.of(context).push('/discuter');
             break;
+          default:
+            print('Navigation non implémentée pour cet index: $index');
         }
       },
-      backgroundColor: Colors.grey[100], // Subtle grey background for consistency
-      selectedItemColor: Colors.red[900], // Red for active items (matches app theme)
-      unselectedItemColor: Colors.grey[600], // Slightly darker grey for inactive items
-      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold), // Bold labels for selected items
-      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal), // Normal weight for unselected
+      backgroundColor: Colors.grey[100],
+      selectedItemColor: Colors.red[900],
+      unselectedItemColor: Colors.grey[600],
+      selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+      unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
       showSelectedLabels: true,
       showUnselectedLabels: true,
-      type: BottomNavigationBarType.fixed, // Ensures all icons are visible without shifting
-      iconSize: 24, // Slightly larger icons for better visibility
+      type: BottomNavigationBarType.fixed,
+      iconSize: 24,
       items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Accueil',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.people),
-          label: 'Communautés',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.add),
-          label: 'Créer',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat),
-          label: 'Discuter',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.mic), // Microphone icon for Podcast
-          label: 'Podcast',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Accueil'),
+        BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Communautés'),
+        BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Créer'),
+        BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Discuter'),
+        BottomNavigationBarItem(icon: Icon(Icons.mic), label: 'Podcast'),
       ],
     );
   }

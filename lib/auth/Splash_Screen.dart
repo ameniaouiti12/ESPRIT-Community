@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:esprit/auth/login_screen';
-
+import 'package:routemaster/routemaster.dart'; // Add Routemaster import
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,18 +15,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Démarrez l'animation après un court délai
+    // Start the animation after a short delay
     Future.delayed(const Duration(milliseconds: 2000), () {
       setState(() {
         _opacity = 1.0;
       });
     });
 
-    // Naviguez vers l'écran de connexion après 3 secondes
+    // Navigate to LoginScreen after 5 seconds using Routemaster
     Future.delayed(const Duration(seconds: 5), () {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
+      Routemaster.of(context).replace('/login'); // Use replace to clear the SplashScreen
     });
   }
 
